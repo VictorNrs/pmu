@@ -1,11 +1,4 @@
-import type {
-  DistanceUsage,
-  Page,
-  RaceDetail,
-  RaceListQuery,
-  RaceParticipation,
-  RaceSummary,
-} from '@pmu/shared';
+import type { Page, RaceDetail, RaceListQuery, RaceParticipation, RaceSummary } from '@pmu/shared';
 import { Prisma } from '../../generated/prisma/client';
 import type { Database } from '../../shared/database/prisma-client';
 import { toIsoDate } from '../../shared/utils/iso-date';
@@ -24,7 +17,7 @@ const RACE_SUMMARY_SELECT = Prisma.sql`
   JOIN racecourses rc ON rc.id = r.racecourse_id
   JOIN terrain_conditions t ON t.id = r.terrain_condition_id`;
 
-/** Read side of races: listing, detail, and the distances in use. */
+/** Read side of races: listing and detail. */
 export class RaceRepository {
   constructor(private readonly database: Database) {}
 
@@ -57,12 +50,6 @@ export class RaceRepository {
       WHERE p.race_id = ${id}
       ORDER BY p.finish_position, h.name_key`);
     return { ...toRaceSummary(row), participations };
-  }
-
-  async listDistances(): Promise<DistanceUsage[]> {
-    return this.database.$queryRaw<DistanceUsage[]>(Prisma.sql`
-      SELECT distance_meters AS "distanceMeters", COUNT(*)::int AS "raceCount"
-      FROM races GROUP BY distance_meters ORDER BY distance_meters`);
   }
 }
 

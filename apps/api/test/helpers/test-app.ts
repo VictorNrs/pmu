@@ -19,15 +19,19 @@ export async function createTestContext(): Promise<TestContext> {
   return { app, database };
 }
 
-/** Removes every source record; the reference terrain conditions of the migration are kept. */
+/** Removes every source record; the reference terrains and distances of the migrations are kept. */
 export async function resetDatabase(database: Database): Promise<void> {
   await database.$executeRawUnsafe(
     'TRUNCATE participations, races, racecourses, horses, stallions RESTART IDENTITY CASCADE',
   );
   await database.$executeRawUnsafe(
-    "DELETE FROM terrain_conditions WHERE label_key NOT IN ('bon','bon souple','souple','tres souple','lourd','tres lourd','psf')",
+    "DELETE FROM terrain_conditions WHERE label_key NOT IN ('bon','souple','tres souple','collant','lourd','psf')",
   );
   await database.$executeRawUnsafe('UPDATE terrain_conditions SET is_active = true');
+  await database.$executeRawUnsafe(
+    'DELETE FROM race_distances WHERE distance_meters NOT IN (1200, 1400, 1600, 2000, 2400)',
+  );
+  await database.$executeRawUnsafe('UPDATE race_distances SET is_active = true');
 }
 
 export async function closeTestContext(context: TestContext): Promise<void> {

@@ -8,7 +8,7 @@ import type {
   StallionTrend,
   StatisticsOverview,
 } from '@pmu/shared';
-import { selectDistanceColumns, selectTerrainColumns } from '../domain/performance-columns';
+import { selectColumns } from '../domain/performance-columns';
 import { buildPerformanceMatrix, type GroupCounts } from '../domain/performance-matrix';
 import { computePerformanceMetrics, sumCounts } from '../domain/performance-metrics';
 import { rankStallions } from '../domain/stallion-ranking';
@@ -82,8 +82,9 @@ export class StatisticsUseCases {
     groups: readonly GroupCounts[],
   ): Promise<PerformanceColumn[]> {
     const keysWithData = new Set(groups.map((group) => group.columnKey));
-    if (query.dimension === 'distance') return selectDistanceColumns(query.distances, keysWithData);
-    const terrains = await this.references.findTerrainConditions();
-    return selectTerrainColumns(terrains, query.terrainConditionIds, keysWithData);
+    const options = await this.references.findColumnOptions(query.dimension);
+    const selectedKeys =
+      query.dimension === 'terrain' ? query.terrainConditionIds : query.distances;
+    return selectColumns(options, selectedKeys, keysWithData);
   }
 }

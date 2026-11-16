@@ -76,6 +76,16 @@ export class RaceWriter {
     return transaction.horse.count({ where: { id: { in: horseIds } } });
   }
 
+  async findDistance(
+    transaction: Transaction,
+    distanceMeters: number,
+  ): Promise<{ isActive: boolean } | null> {
+    return transaction.raceDistance.findUnique({
+      where: { meters: distanceMeters },
+      select: { isActive: true },
+    });
+  }
+
   async terrainConditionExists(transaction: Transaction, id: number): Promise<boolean> {
     return (await transaction.terrainCondition.count({ where: { id } })) > 0;
   }

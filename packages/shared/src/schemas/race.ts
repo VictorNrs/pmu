@@ -77,8 +77,3 @@ export interface Page<T> {
   items: T[];
   total: number;
 }
-
-export interface DistanceUsage {
-  distanceMeters: number;
-  raceCount: number;
-}

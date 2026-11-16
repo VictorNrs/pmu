@@ -60,12 +60,22 @@ model Racecourse {
   @@map("racecourses")
 }
 
+/// Distances allowed for races: each one is a column of the distance table.
+model RaceDistance {
+  meters   Int     @id @map("distance_meters")
+  isActive Boolean @default(true) @map("is_active")
+  races    Race[]
+
+  @@map("race_distances")
+}
+
 model Race {
   id                 Int              @id @default(autoincrement())
   raceDate           DateTime         @map("race_date") @db.Date
   racecourseId       Int              @map("racecourse_id")
   racecourse         Racecourse       @relation(fields: [racecourseId], references: [id], onDelete: Restrict)
   distanceMeters     Int              @map("distance_meters")
+  distance           RaceDistance     @relation(fields: [distanceMeters], references: [meters], onDelete: Restrict, onUpdate: Restrict)
   terrainConditionId Int              @map("terrain_condition_id")
   terrainCondition   TerrainCondition @relation(fields: [terrainConditionId], references: [id], onDelete: Restrict)
   createdAt          DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)

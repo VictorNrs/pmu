@@ -1,37 +1,27 @@
 import type { PerformanceColumn } from '@pmu/shared';
 
-interface TerrainOption {
-  id: number;
+/** An entry of a reference list (terrain condition or distance), in display order. */
+export interface ColumnOption {
+  key: number;
   label: string;
   isActive: boolean;
 }
 
 /**
- * Terrain columns: the selected terrains, or every active terrain when none is selected.
- * A terrain holding data is always kept (even if deactivated) so that the columns
- * add up to the row total.
+ * Columns of a comparison table: the selected entries, or every active entry when none
+ * is selected. An entry holding data is always kept (even if deactivated) so that the
+ * columns add up to the row total.
  */
-export function selectTerrainColumns(
-  terrains: readonly TerrainOption[],
-  selectedIds: readonly number[] | undefined,
+export function selectColumns(
+  options: readonly ColumnOption[],
+  selectedKeys: readonly number[] | undefined,
   keysWithData: ReadonlySet<number>,
 ): PerformanceColumn[] {
-  const isSelected = (terrain: TerrainOption) =>
-    selectedIds?.length ? selectedIds.includes(terrain.id) : terrain.isActive;
-  return terrains
-    .filter((terrain) => isSelected(terrain) || keysWithData.has(terrain.id))
-    .map((terrain) => ({ key: terrain.id, label: terrain.label }));
-}
-
-/** Distance columns: every exact distance holding data, plus the explicitly selected ones. */
-export function selectDistanceColumns(
-  selectedDistances: readonly number[] | undefined,
-  keysWithData: ReadonlySet<number>,
-): PerformanceColumn[] {
-  const distances = new Set([...(selectedDistances ?? []), ...keysWithData]);
-  return [...distances]
-    .sort((left, right) => left - right)
-    .map((distance) => ({ key: distance, label: formatDistance(distance) }));
+  const isSelected = (option: ColumnOption) =>
+    selectedKeys?.length ? selectedKeys.includes(option.key) : option.isActive;
+  return options
+    .filter((option) => isSelected(option) || keysWithData.has(option.key))
+    .map((option) => ({ key: option.key, label: option.label }));
 }
 
 export function formatDistance(distanceMeters: number): string {

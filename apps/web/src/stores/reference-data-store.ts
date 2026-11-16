@@ -1,25 +1,26 @@
-import type { DistanceUsage, TerrainCondition } from '@pmu/shared';
+import type { RaceDistance, TerrainCondition } from '@pmu/shared';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { racesApi, referenceDataApi } from '@/services/data-api';
+import { referenceDataApi } from '@/services/data-api';
 
 /** Terrains and distances used by filters and forms across pages. */
 export const useReferenceDataStore = defineStore('reference-data', () => {
   const terrainConditions = ref<TerrainCondition[]>([]);
-  const distances = ref<DistanceUsage[]>([]);
+  const distances = ref<RaceDistance[]>([]);
 
   const activeTerrainConditions = computed(() =>
     terrainConditions.value.filter((terrain) => terrain.isActive),
   );
+  const activeDistances = computed(() => distances.value.filter((distance) => distance.isActive));
 
   async function refresh(): Promise<void> {
-    const [terrains, usedDistances] = await Promise.all([
+    const [terrains, raceDistances] = await Promise.all([
       referenceDataApi.terrainConditions(),
-      racesApi.distances(),
+      referenceDataApi.distances(),
     ]);
     terrainConditions.value = terrains;
-    distances.value = usedDistances;
+    distances.value = raceDistances;
   }
 
-  return { terrainConditions, activeTerrainConditions, distances, refresh };
+  return { terrainConditions, activeTerrainConditions, distances, activeDistances, refresh };
 });

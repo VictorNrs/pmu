@@ -1,11 +1,4 @@
-import type {
-  DistanceUsage,
-  Page,
-  RaceData,
-  RaceDetail,
-  RaceListQuery,
-  RaceSummary,
-} from '@pmu/shared';
+import type { Page, RaceData, RaceDetail, RaceListQuery, RaceSummary } from '@pmu/shared';
 import type { Prisma } from '../../generated/prisma/client';
 import {
   ConflictError,
@@ -25,10 +18,6 @@ export class RaceService {
     return this.races.list(query);
   }
 
-  async listDistances(): Promise<DistanceUsage[]> {
-    return this.races.listDistances();
-  }
-
   async get(id: number): Promise<RaceDetail> {
     const race = await this.races.findById(id);
     if (!race) throw new NotFoundError('Course introuvable.');
@@ -44,9 +33,9 @@ export class RaceService {
   }
 
   async update(id: number, data: RaceData): Promise<RaceDetail> {
-    await this.get(id);
+    const current = await this.get(id);
     await this.writer.transaction(async (transaction) => {
-      await this.assertValid(transaction, data, id);
+      await this.assertValid(transaction, data, current);
       await this.writer.update(transaction, id, data);
     });
     return this.get(id);
@@ -64,8 +53,9 @@ export class RaceService {
   private async assertValid(
     transaction: Prisma.TransactionClient,
     data: RaceData,
-    raceId?: number,
+    current?: RaceDetail,
   ): Promise<void> {
+    await this.assertDistanceAllowed(transaction, data.distanceMeters, current);
     if (!(await this.writer.terrainConditionExists(transaction, data.terrainConditionId))) {
       throw new InvalidRequestError("L'état du terrain sélectionné n'existe pas.");
     }
@@ -73,7 +63,25 @@ export class RaceService {
     if ((await this.writer.countExistingHorses(transaction, horseIds)) !== horseIds.length) {
       throw new InvalidRequestError("Au moins un des chevaux sélectionnés n'existe pas.");
     }
-    await this.assertOneRacePerDay(transaction, horseIds, data.raceDate, raceId);
+    await this.assertOneRacePerDay(transaction, horseIds, data.raceDate, current?.id);
+  }
+
+  /**
+   * Only distances of the reference list are allowed. A deactivated distance is refused for
+   * new entries but kept when editing a race that already uses it.
+   */
+  private async assertDistanceAllowed(
+    transaction: Prisma.TransactionClient,
+    distanceMeters: number,
+    current?: RaceDetail,
+  ): Promise<void> {
+    const distance = await this.writer.findDistance(transaction, distanceMeters);
+    const isUnchanged = current?.distanceMeters === distanceMeters;
+    if (!distance || (!distance.isActive && !isUnchanged)) {
+      throw new InvalidRequestError(
+        `La distance ${distanceMeters} m ne fait pas partie de la liste des distances (voir Paramètres).`,
+      );
+    }
   }
 
   /**

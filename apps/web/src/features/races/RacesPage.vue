@@ -39,9 +39,9 @@ const terrainOptions = computed(() =>
   referenceData.terrainConditions.map((terrain) => ({ label: terrain.label, value: terrain.id })),
 );
 const distanceOptions = computed(() =>
-  referenceData.distances.map((usage) => ({
-    label: `${usage.distanceMeters} m`,
-    value: usage.distanceMeters,
+  referenceData.distances.map((distance) => ({
+    label: `${distance.distanceMeters} m`,
+    value: distance.distanceMeters,
   })),
 );
 const pagination = computed<PaginationProps>(() => ({

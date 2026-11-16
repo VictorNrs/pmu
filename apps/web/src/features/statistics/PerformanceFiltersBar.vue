@@ -28,9 +28,9 @@ const terrainOptions = computed(() =>
   })),
 );
 const distanceOptions = computed(() =>
-  referenceData.distances.map((usage) => ({
-    label: `${usage.distanceMeters} m (${usage.raceCount} course${usage.raceCount > 1 ? 's' : ''})`,
-    value: usage.distanceMeters,
+  referenceData.distances.map((distance) => ({
+    label: `${distance.distanceMeters} m (${distance.raceCount} course${distance.raceCount > 1 ? 's' : ''})`,
+    value: distance.distanceMeters,
   })),
 );
 const highlightOptions = INDICATORS.filter((indicator) => indicator.key !== 'raceCount').map(

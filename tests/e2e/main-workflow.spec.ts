@@ -39,8 +39,8 @@ test.describe.serial('Main workflow', () => {
     await page.getByRole('button', { name: 'Saisir une course' }).click();
     const dialog = page.locator('.n-modal').last();
     await dialog.getByPlaceholder('Ex. Longchamp').fill('Longchamp');
-    await dialog.getByPlaceholder('Ex. 1600').fill('1600');
-    await chooseOption(page, dialog.locator('.n-select').first(), 'Souple');
+    await chooseOption(page, dialog.locator('.n-select').nth(0), '1600 m');
+    await chooseOption(page, dialog.locator('.n-select').nth(1), 'Souple');
 
     await chooseOption(page, dialog.locator('.participation-row__horse').first(), 'Alpha Star');
     await dialog.getByRole('button', { name: 'Ajouter un cheval' }).click();
@@ -66,8 +66,8 @@ test.describe.serial('Main workflow', () => {
     await page.getByRole('button', { name: 'Saisir une course' }).click();
     const dialog = page.locator('.n-modal').last();
     await dialog.getByPlaceholder('Ex. Longchamp').fill('Chantilly');
-    await dialog.getByPlaceholder('Ex. 1600').fill('2000');
-    await chooseOption(page, dialog.locator('.n-select').first(), 'Bon');
+    await chooseOption(page, dialog.locator('.n-select').nth(0), '2000 m');
+    await chooseOption(page, dialog.locator('.n-select').nth(1), 'Bon');
     await chooseOption(page, dialog.locator('.participation-row__horse').first(), 'Alpha Star');
     await dialog.getByRole('button', { name: 'Enregistrer la course' }).click();
     await expect(page.getByText("Un cheval ne court qu'une course par jour")).toBeVisible();

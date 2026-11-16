@@ -7,6 +7,8 @@ import { StallionRepository } from './features/pedigrees/stallion-repository';
 import { registerStallionRoutes } from './features/pedigrees/stallion-routes';
 import { StallionService } from './features/pedigrees/stallion-service';
 import { ParticipationRepository } from './features/races/participation-repository';
+import { registerRaceDistanceRoutes } from './features/races/race-distance-routes';
+import { RaceDistanceService } from './features/races/race-distance-service';
 import { RaceRepository } from './features/races/race-repository';
 import { registerRaceRoutes } from './features/races/race-routes';
 import { RaceService } from './features/races/race-service';
@@ -47,6 +49,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     new ParticipationRepository(database),
   );
   registerReferenceDataRoutes(app, new ReferenceDataService(database));
+  registerRaceDistanceRoutes(app, new RaceDistanceService(database));
   registerStatisticsRoutes(
     app,
     new StatisticsUseCases(

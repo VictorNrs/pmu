@@ -127,6 +127,53 @@ describe('Data integrity (PostgreSQL)', () => {
     });
   });
 
+  describe('reference list of distances', () => {
+    it('refuses a distance outside the list', async () => {
+      const { race, horseB } = await setUpRace();
+      const response = await request('POST', '/api/races', {
+        ...race,
+        racecourseName: 'Chantilly',
+        raceDate: '2026-03-02',
+        distanceMeters: 1800,
+        participations: [{ horseId: horseB, finishPosition: 1 }],
+      });
+      expect(response.statusCode).toBe(400);
+      expect(response.json<{ message: string }>().message).toContain('1800 m');
+    });
+
+    it('refuses a deactivated distance for a new race but keeps it when editing', async () => {
+      const { race, raceId, horseB } = await setUpRace();
+      await request('PUT', '/api/race-distances/1600', { isActive: false });
+      const created = await request('POST', '/api/races', {
+        ...race,
+        racecourseName: 'Chantilly',
+        raceDate: '2026-03-02',
+        participations: [{ horseId: horseB, finishPosition: 1 }],
+      });
+      expect(created.statusCode).toBe(400);
+      const edited = await request('PUT', `/api/races/${raceId}`, {
+        ...race,
+        racecourseName: 'Longchamp',
+      });
+      expect(edited.statusCode).toBe(200);
+    });
+
+    it('refuses to delete a distance used by races, and adds a new one', async () => {
+      await setUpRace();
+      expect((await request('DELETE', '/api/race-distances/1600')).statusCode).toBe(409);
+      const added = await request('POST', '/api/race-distances', { distanceMeters: 3000 });
+      expect(added.statusCode).toBe(201);
+      expect((await request('DELETE', '/api/race-distances/3000')).statusCode).toBe(204);
+    });
+
+    it('enforces the list in PostgreSQL as well', async () => {
+      const { raceId } = await setUpRace();
+      await expect(
+        context.database.race.update({ where: { id: raceId }, data: { distanceMeters: 1800 } }),
+      ).rejects.toThrow();
+    });
+  });
+
   describe('race update', () => {
     it('replaces the participations and moves them to the new date', async () => {
       const { race, raceId, horseA, horseB } = await setUpRace();

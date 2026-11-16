@@ -15,8 +15,6 @@ export function registerRaceRoutes(
 ): void {
   app.get('/api/races', async (request) => races.list(raceListQuerySchema.parse(request.query)));
 
-  app.get('/api/races/distances', async () => races.listDistances());
-
   app.get('/api/races/:id', async (request) => races.get(idParamsSchema.parse(request.params).id));
 
   app.post('/api/races', async (request, reply) => {

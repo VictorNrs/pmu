@@ -61,12 +61,13 @@ const terrainOptions = computed(() =>
     value: terrain.id,
   })),
 );
-const frequentDistances = computed(() =>
-  [...referenceData.distances]
-    .sort((a, b) => b.raceCount - a.raceCount)
-    .slice(0, 8)
-    .map((usage) => usage.distanceMeters)
-    .sort((a, b) => a - b),
+/** Active distances of the reference list, plus the current one when editing a race. */
+const distanceOptions = computed(() =>
+  referenceData.distances
+    .filter(
+      (distance) => distance.isActive || distance.distanceMeters === props.race?.distanceMeters,
+    )
+    .map((distance) => ({ label: `${distance.distanceMeters} m`, value: distance.distanceMeters })),
 );
 
 watch(show, async (visible) => {
@@ -160,13 +161,10 @@ async function submit(): Promise<void> {
           :feedback="errors.distanceMeters"
           :validation-status="errors.distanceMeters ? 'error' : undefined"
         >
-          <NInputNumber
+          <NSelect
             v-model:value="form.distanceMeters"
-            :min="400"
-            :max="8000"
-            :step="100"
-            placeholder="Ex. 1600"
-            class="full"
+            :options="distanceOptions"
+            placeholder="Choisir"
           />
         </NFormItem>
         <NFormItem
@@ -181,17 +179,6 @@ async function submit(): Promise<void> {
             placeholder="Choisir"
           />
         </NFormItem>
-      </div>
-      <div v-if="frequentDistances.length" class="quick-distances">
-        <span class="muted">Distances fréquentes :</span>
-        <NButton
-          v-for="distance in frequentDistances"
-          :key="distance"
-          size="tiny"
-          secondary
-          @click="form.distanceMeters = distance"
-          >{{ distance }} m</NButton
-        >
       </div>
 
       <div class="participations-header">
@@ -261,14 +248,6 @@ async function submit(): Promise<void> {
 <style scoped>
 .full {
   width: 100%;
-}
-.quick-distances {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin: -8px 0 16px;
-  font-size: 12px;
 }
 .participations-header {
   display: flex;

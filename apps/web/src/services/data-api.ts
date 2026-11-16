@@ -1,5 +1,4 @@
 import type {
-  DistanceUsage,
   Horse,
   HorseInput,
   HorseListQuery,
@@ -7,6 +6,8 @@ import type {
   ParticipationDetail,
   ParticipationListQuery,
   RaceDetail,
+  RaceDistance,
+  RaceDistanceInput,
   RaceInput,
   RaceListQuery,
   RaceSummary,
@@ -41,7 +42,6 @@ export const racesApi = {
   create: (input: RaceInput) => apiClient.post<RaceDetail>('/api/races', input),
   update: (id: number, input: RaceInput) => apiClient.put<RaceDetail>(`/api/races/${id}`, input),
   remove: (id: number) => apiClient.delete(`/api/races/${id}`),
-  distances: () => apiClient.get<DistanceUsage[]>('/api/races/distances'),
 };
 
 export const participationsApi = {
@@ -61,4 +61,11 @@ export const referenceDataApi = {
   renameRacecourse: (id: number, name: string) =>
     apiClient.put<Racecourse[]>(`/api/racecourses/${id}`, { name }),
   removeRacecourse: (id: number) => apiClient.delete(`/api/racecourses/${id}`),
+  distances: () => apiClient.get<RaceDistance[]>('/api/race-distances'),
+  createDistance: (input: RaceDistanceInput) =>
+    apiClient.post<RaceDistance[]>('/api/race-distances', input),
+  setDistanceActive: (distanceMeters: number, isActive: boolean) =>
+    apiClient.put<RaceDistance[]>(`/api/race-distances/${distanceMeters}`, { isActive }),
+  removeDistance: (distanceMeters: number) =>
+    apiClient.delete(`/api/race-distances/${distanceMeters}`),
 };

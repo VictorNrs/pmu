@@ -1,15 +1,10 @@
-import type { StatisticsOverview } from '@pmu/shared';
+import type { PerformanceDimension, StatisticsOverview } from '@pmu/shared';
 import type { Database } from '../../../shared/database/prisma-client';
 import { toIsoDate } from '../../../shared/utils/iso-date';
+import { formatDistance, type ColumnOption } from '../domain/performance-columns';
 import type { StallionReference } from '../domain/performance-matrix';
 
 export type SourceVolumes = Omit<StatisticsOverview, 'global'>;
-
-export interface TerrainReference {
-  id: number;
-  label: string;
-  isActive: boolean;
-}
 
 /** Reference data the statistics need to build complete grids (rows and columns). */
 export class StatisticsReferenceRepository {
@@ -41,10 +36,19 @@ export class StatisticsReferenceRepository {
     };
   }
 
-  async findTerrainConditions(): Promise<TerrainReference[]> {
-    return this.database.terrainCondition.findMany({
-      select: { id: true, label: true, isActive: true },
+  /** Column options of a table, in display order. */
+  async findColumnOptions(dimension: PerformanceDimension): Promise<ColumnOption[]> {
+    if (dimension === 'distance') {
+      const distances = await this.database.raceDistance.findMany({ orderBy: { meters: 'asc' } });
+      return distances.map(({ meters, isActive }) => ({
+        key: meters,
+        label: formatDistance(meters),
+        isActive,
+      }));
+    }
+    const terrains = await this.database.terrainCondition.findMany({
       orderBy: [{ sortOrder: 'asc' }, { labelKey: 'asc' }],
     });
+    return terrains.map(({ id, label, isActive }) => ({ key: id, label, isActive }));
   }
 }

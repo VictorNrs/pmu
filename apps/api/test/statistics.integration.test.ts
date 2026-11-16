@@ -97,8 +97,15 @@ describe('Statistics (PostgreSQL)', () => {
       expect(row(matrix, zulu)?.total).toMatchObject({ raceCount: 0, winRate: null });
     });
 
-    it('shows every active terrain as a column', () => {
-      expect(matrix.columns).toHaveLength(7);
+    it('shows every active terrain as a column, in the reference order', () => {
+      expect(matrix.columns.map((column) => column.label)).toEqual([
+        'Bon',
+        'Souple',
+        'Très souple',
+        'Collant',
+        'Lourd',
+        'PSF',
+      ]);
     });
 
     it('groups participations by terrain', () => {
@@ -143,12 +150,16 @@ describe('Statistics (PostgreSQL)', () => {
   });
 
   describe('distance table', () => {
-    it('uses the same rules with exact distances as columns', async () => {
+    it('uses the same rules with the reference distances as columns', async () => {
       const matrix = await get<PerformanceMatrix>('/api/statistics/performance?dimension=distance');
-      expect(matrix.columns).toEqual([
-        { key: 1600, label: '1600 m' },
-        { key: 2000, label: '2000 m' },
+      expect(matrix.columns.map((column) => column.label)).toEqual([
+        '1200 m',
+        '1400 m',
+        '1600 m',
+        '2000 m',
+        '2400 m',
       ]);
+      expect(row(matrix, alpha)?.cells[1200]).toMatchObject({ raceCount: 0, winRate: null });
       expect(row(matrix, alpha)?.cells[1600]).toMatchObject({
         raceCount: 4,
         winCount: 1,
