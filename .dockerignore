@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+apps/api/src/generated
+.env
+.git
+coverage
+test-results
+playwright-report

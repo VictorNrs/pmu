@@ -12,7 +12,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "db:up": "docker compose up -d --wait",
+    "start": "docker compose up -d --build --wait",
+    "stop": "docker compose down",
+    "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose down",
     "db:migrate": "npm run db:migrate --workspace @pmu/api",
     "db:deploy": "npm run db:deploy --workspace @pmu/api",
