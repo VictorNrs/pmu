@@ -19,11 +19,14 @@ import { StatisticsReferenceRepository } from './features/statistics/infrastruct
 import { registerStatisticsRoutes } from './features/statistics/presentation/statistics-routes';
 import type { Database } from './shared/database/prisma-client';
 import { handleError } from './shared/errors/error-handler';
+import { registerWebClient } from './shared/http/web-client';
 
 export interface AppOptions {
   database: Database;
   webOrigin: string;
   logger?: boolean;
+  /** Built frontend to serve (Docker); omitted in development where Vite serves it. */
+  webDistDirectory?: string;
 }
 
 /** Composition root: wires repositories, services and routes. */
@@ -52,5 +55,6 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     ),
   );
   app.get('/api/health', async () => ({ status: 'ok' }));
+  if (options.webDistDirectory) await registerWebClient(app, options.webDistDirectory);
   return app;
 }

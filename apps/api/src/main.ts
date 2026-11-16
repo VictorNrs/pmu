@@ -5,7 +5,12 @@ import { createDatabase } from './shared/database/prisma-client';
 async function start(): Promise<void> {
   const environment = readEnvironment();
   const database = createDatabase(environment.DATABASE_URL);
-  const app = await buildApp({ database, webOrigin: environment.WEB_ORIGIN, logger: true });
+  const app = await buildApp({
+    database,
+    webOrigin: environment.WEB_ORIGIN,
+    webDistDirectory: environment.WEB_DIST_DIR,
+    logger: true,
+  });
 
   const shutdown = async () => {
     await app.close();

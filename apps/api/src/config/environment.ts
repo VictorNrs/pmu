@@ -6,6 +6,8 @@ const environmentSchema = z.object({
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   API_HOST: z.string().default('127.0.0.1'),
   WEB_ORIGIN: z.string().url().default('http://localhost:5173'),
+  /** Absolute path of the built frontend; set in the Docker image only. */
+  WEB_DIST_DIR: z.string().min(1).optional(),
 });
 
 export type Environment = z.infer<typeof environmentSchema>;

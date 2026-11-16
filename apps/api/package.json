@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.4.3",
+    "@fastify/static": "^10.1.11",
     "@pmu/shared": "*",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
