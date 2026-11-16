@@ -11,6 +11,7 @@ export interface PerformanceFilterState {
   indicatorKeys: IndicatorKey[];
   highlightKey: IndicatorKey;
   hideStallionsWithoutRace: boolean;
+  showAverageDelta: boolean;
 }
 
 export function createDefaultFilterState(): PerformanceFilterState {
@@ -30,6 +31,7 @@ export function createDefaultFilterState(): PerformanceFilterState {
     ],
     highlightKey: 'winRate',
     hideStallionsWithoutRace: false,
+    showAverageDelta: false,
   };
 }
 

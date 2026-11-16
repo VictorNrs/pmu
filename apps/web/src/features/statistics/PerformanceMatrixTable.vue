@@ -4,6 +4,7 @@ import { NDataTable, NEmpty, type DataTableSortState } from 'naive-ui';
 import { computed, ref } from 'vue';
 import type { IndicatorDefinition } from '@/utils/metric-format';
 import { buildTableColumns, type SortState } from './performance-table-columns';
+import { buildAverageSummary } from './performance-table-summary';
 
 const props = defineProps<{
   matrix: PerformanceMatrix;
@@ -11,6 +12,7 @@ const props = defineProps<{
   indicators: readonly IndicatorDefinition[];
   highlight: IndicatorDefinition;
   minRaces: number;
+  showAverageDelta: boolean;
   loading: boolean;
 }>();
 
@@ -26,10 +28,13 @@ const columns = computed(() =>
     indicators: props.indicators,
     highlight: props.highlight,
     minRaces: props.minRaces,
+    showAverageDelta: props.showAverageDelta,
     sort: sort.value,
     onCellClick: (row, column) => emit('cellClick', row, column),
   }),
 );
+
+const summary = () => buildAverageSummary(props.matrix, props.indicators);
 
 const scrollWidth = computed(() => {
   const groupWidth = props.indicators.reduce(
@@ -59,6 +64,8 @@ function onSorterChange(state: DataTableSortState | DataTableSortState[] | null)
     size="small"
     :single-line="false"
     striped
+    :summary="summary"
+    summary-placement="bottom"
     @update:sorter="onSorterChange"
   >
     <template #empty>
@@ -96,6 +103,29 @@ function onSorterChange(state: DataTableSortState | DataTableSortState[] | null)
 .performance-table :deep(.metric-cell--low-sample) {
   color: var(--text-muted);
   font-style: italic;
+}
+.performance-table :deep(.metric-delta) {
+  display: block;
+  font-size: 10.5px;
+  font-style: normal;
+  line-height: 1.2;
+}
+.performance-table :deep(.metric-delta--better) {
+  color: #5fd3a5;
+}
+.performance-table :deep(.metric-delta--worse) {
+  color: #f08f8f;
+}
+.performance-table :deep(.metric-delta--equal) {
+  color: var(--text-muted);
+}
+.performance-table :deep(.metric-cell--summary) {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.performance-table :deep(.summary-label) {
+  font-weight: 700;
+  color: var(--gold);
 }
 .performance-table :deep(.metric-cell--best) {
   color: #ffe08a;

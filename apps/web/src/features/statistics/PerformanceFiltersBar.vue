@@ -135,6 +135,7 @@ function reset(): void {
       <NCheckbox v-model:checked="state.hideStallionsWithoutRace"
         >Masquer les étalons sans course</NCheckbox
       >
+      <NCheckbox v-model:checked="state.showAverageDelta">Écart à la moyenne</NCheckbox>
       <NButton quaternary size="small" @click="reset">Réinitialiser</NButton>
     </div>
   </div>

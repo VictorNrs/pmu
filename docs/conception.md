@@ -9,8 +9,9 @@
 | Moyenne | **Rang moyen d'arrivée** = somme des rangs ÷ nombre de courses (plus bas = meilleur) |
 | Statuts hors classement | Non saisis : seules les participations avec un rang numérique (≥ 1) sont enregistrées |
 | Ex-aequo | Autorisés (deux chevaux 1ers comptent chacun une victoire) |
-| Distances | Une colonne par distance exacte ; filtre pour choisir les colonnes affichées |
-| Terrains | Liste administrable ; filtre pour choisir les colonnes affichées |
+| Distances | Liste administrable : 1200, 1400, 1600, 2000, 2400 m ; filtre pour choisir les colonnes affichées |
+| Terrains | Liste administrable : Bon, Souple, Très souple, Collant, Lourd, PSF ; filtre pour les colonnes |
+| Hors liste | Les courses existantes hors de ces listes ont été supprimées (migration du 16/11/2026) |
 | Course | Date + hippodrome + distance + terrain (distance et terrain obligatoires) |
 | Doublons | Un cheval ne court qu'une course par jour ; un cheval au plus une fois par course |
 | Cheval | Unique par nom |
@@ -51,10 +52,22 @@ exactement les courses qui la composent.
 « minimum de courses », réglable, grise les cellules sous le seuil et les exclut de la mise en
 évidence, des classements et de la heatmap.
 
+**Moyenne de référence** : chaque tableau renvoie, par colonne et au total, les indicateurs
+calculés sur toutes les participations de la sélection, tous étalons confondus. Les compteurs de
+tous les étalons sont additionnés avant le calcul (jamais une moyenne de moyennes). Elle est
+affichée en ligne « Moyenne », et l'option « Écart à la moyenne » montre l'écart en points de
+pourcentage (taux) ou en places (rang moyen). L'écart n'est affiché que pour les cellules qui
+atteignent le minimum de courses.
+
+**Tableau de bord** : volumes de données et classements par étalon uniquement. Aucun taux
+global tous étalons confondus n'y est affiché : mélangeant étalons, terrains et distances, il
+ne serait pas interprétable.
+
 ## Modèle de données
 
 ```text
 stallions 1──N horses 1──N participations N──1 races N──1 terrain_conditions
+                                                    N──1 race_distances
                                                     N──1 racecourses
 ```
 
@@ -75,13 +88,12 @@ stallions 1──N horses 1──N participations N──1 races N──1 terrai
 |---|---|---|
 | CRUD | `/api/stallions`, `/api/horses` | Étalons, chevaux (`?search=`, `?stallionId=`) |
 | CRUD | `/api/races` | Course + participations en une seule requête (`PUT` remplace la liste) |
-| GET | `/api/races/distances` | Distances utilisées |
 | GET / DELETE | `/api/participations` | Résultats individuels (mêmes filtres que les statistiques) |
-| CRUD | `/api/terrain-conditions`, `/api/racecourses` | Données de référence |
-| GET | `/api/statistics/performance?dimension=terrain\|distance` | Matrice étalons × colonnes |
+| CRUD | `/api/terrain-conditions`, `/api/race-distances`, `/api/racecourses` | Données de référence |
+| GET | `/api/statistics/performance?dimension=terrain\|distance` | Matrice étalons × colonnes + moyenne de référence |
 | GET | `/api/statistics/rankings?metric=&minRaces=` | Classement |
 | GET | `/api/statistics/trends` | Évolution mensuelle |
-| GET | `/api/statistics/overview` | Tableau de bord |
+| GET | `/api/statistics/overview` | Volumes de données (tableau de bord) |
 
 Filtres communs : `stallionIds`, `terrainConditionIds`, `distances` (listes séparées par des
 virgules), `from`, `to` (AAAA-MM-JJ). Combiner `dimension=terrain&distances=1600` donne
@@ -91,4 +103,4 @@ l'analyse croisée « terrain × 1600 m » avec les mêmes règles de calcul.
 
 Tableau de bord · Stats par terrain · Stats par distance · Graphiques (classement,
 comparaison, heatmap, évolution) · Courses & résultats · Étalons (et fiche détaillée) · Chevaux ·
-Paramètres (terrains, hippodromes).
+Paramètres (terrains, distances, hippodromes).

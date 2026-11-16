@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Horse, PerformanceMatrix, Stallion } from '@pmu/shared';
+import type { Horse, Stallion } from '@pmu/shared';
 import { NAlert, NButton, NCard, NGrid, NGi, NTag } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -8,15 +8,10 @@ import { horsesApi, stallionsApi } from '@/services/data-api';
 import { statisticsApi } from '@/services/statistics-api';
 import { formatAverage, formatCount, formatPercent } from '@/utils/metric-format';
 import ConditionBreakdownTable from '@/features/statistics/ConditionBreakdownTable.vue';
+import { emptyMatrix } from '@/features/statistics/empty-matrix';
 import StallionFormModal from './StallionFormModal.vue';
 
 const props = defineProps<{ stallionId: number }>();
-
-const emptyMatrix = (dimension: 'terrain' | 'distance'): PerformanceMatrix => ({
-  dimension,
-  columns: [],
-  rows: [],
-});
 
 const stallion = ref<Stallion | null>(null);
 const horses = ref<Horse[]>([]);

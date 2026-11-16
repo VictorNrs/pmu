@@ -13,6 +13,7 @@ import { statisticsApi } from '@/services/statistics-api';
 import { useReferenceDataStore } from '@/stores/reference-data-store';
 import { getIndicator, INDICATORS } from '@/utils/metric-format';
 import { matchesSearch } from '@/utils/search';
+import { emptyMatrix } from './empty-matrix';
 import ParticipationsDrawer from './ParticipationsDrawer.vue';
 import PerformanceFiltersBar from './PerformanceFiltersBar.vue';
 import PerformanceMatrixTable from './PerformanceMatrixTable.vue';
@@ -39,7 +40,7 @@ const COPY = {
 
 const referenceData = useReferenceDataStore();
 const state = ref(createDefaultFilterState());
-const matrix = ref<PerformanceMatrix>({ dimension: props.dimension, columns: [], rows: [] });
+const matrix = ref<PerformanceMatrix>(emptyMatrix(props.dimension));
 const loading = ref(false);
 const error = ref<string | null>(null);
 
@@ -142,6 +143,7 @@ function openCell(row: StallionPerformanceRow, column: PerformanceColumn | null)
       :indicators="indicators"
       :highlight="highlight"
       :min-races="state.minRaces"
+      :show-average-delta="state.showAverageDelta"
       :loading="loading"
       @cell-click="openCell"
     />

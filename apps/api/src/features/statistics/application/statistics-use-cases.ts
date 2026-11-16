@@ -10,7 +10,7 @@ import type {
 } from '@pmu/shared';
 import { selectColumns } from '../domain/performance-columns';
 import { buildPerformanceMatrix, type GroupCounts } from '../domain/performance-matrix';
-import { computePerformanceMetrics, sumCounts } from '../domain/performance-metrics';
+import { computePerformanceMetrics } from '../domain/performance-metrics';
 import { rankStallions } from '../domain/stallion-ranking';
 import type { ParticipationAggregateRepository } from '../infrastructure/participation-aggregate-repository';
 import type { StatisticsReferenceRepository } from '../infrastructure/statistics-reference-repository';
@@ -50,12 +50,9 @@ export class StatisticsUseCases {
     return rankStallions(candidates, { metric, minRaces, limit });
   }
 
+  /** Data volumes only: a global rate mixing every stallion and condition would mean nothing. */
   async getOverview(): Promise<StatisticsOverview> {
-    const [volumes, counts] = await Promise.all([
-      this.references.countSources(),
-      this.aggregates.countByStallion({}),
-    ]);
-    return { ...volumes, global: computePerformanceMetrics(sumCounts(counts)) };
+    return this.references.countSources();
   }
 
   async getTrends(filters: PerformanceFilters): Promise<StallionTrend[]> {

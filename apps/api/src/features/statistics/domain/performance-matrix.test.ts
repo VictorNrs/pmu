@@ -63,6 +63,24 @@ describe('buildPerformanceMatrix', () => {
     });
   });
 
+  it('computes the reference average from the summed counters of every stallion', () => {
+    const withBravo = buildPerformanceMatrix('terrain', stallions, columns, [
+      group(1, 10, [2, 1, 1, 3]),
+      group(2, 10, [3, 0, 1, 15]),
+    ]);
+    // Bon: 5 races, 1 win, 2 places, positions sum 18
+    expect(withBravo.average.cells[10]).toEqual({
+      raceCount: 5,
+      winCount: 1,
+      placeCount: 2,
+      winRate: 0.2,
+      placeRate: 0.4,
+      averageFinishPosition: 3.6,
+    });
+    expect(withBravo.average.cells[20]).toMatchObject({ raceCount: 0, winRate: null });
+    expect(withBravo.average.total).toMatchObject({ raceCount: 5, winRate: 0.2 });
+  });
+
   it('rejects duplicated aggregates for the same cell', () => {
     const duplicated = [group(1, 10, [1, 1, 0, 1]), group(1, 10, [1, 1, 0, 1])];
     expect(() => buildPerformanceMatrix('terrain', stallions, columns, duplicated)).toThrow(

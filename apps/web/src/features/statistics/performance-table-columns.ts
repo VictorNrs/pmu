@@ -8,6 +8,7 @@ import type { DataTableColumn, DataTableColumns } from 'naive-ui';
 import { h } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { IndicatorDefinition } from '@/utils/metric-format';
+import { compareToAverage } from './average-comparison';
 import {
   compareIndicator,
   findBestValue,
@@ -28,6 +29,8 @@ export interface TableColumnOptions {
   indicators: readonly IndicatorDefinition[];
   highlight: IndicatorDefinition;
   minRaces: number;
+  /** Shows the gap to the reference average next to rates and average positions. */
+  showAverageDelta: boolean;
   sort: SortState | null;
   onCellClick: (row: StallionPerformanceRow, column: PerformanceColumn | null) => void;
 }
@@ -36,7 +39,13 @@ function metricsOf(row: StallionPerformanceRow, key: ColumnKey): PerformanceMetr
   return key === TOTAL_COLUMN_KEY ? row.total : (row.cells[key] as PerformanceMetrics);
 }
 
-function leafKey(columnKey: ColumnKey, indicator: IndicatorDefinition): string {
+export function averageOf(matrix: PerformanceMatrix, key: ColumnKey): PerformanceMetrics {
+  return key === TOTAL_COLUMN_KEY
+    ? matrix.average.total
+    : (matrix.average.cells[key] as PerformanceMetrics);
+}
+
+export function leafKey(columnKey: ColumnKey, indicator: IndicatorDefinition): string {
   return `${columnKey}:${indicator.key}`;
 }
 
@@ -45,12 +54,17 @@ function renderCell(
   indicator: IndicatorDefinition,
   options: TableColumnOptions,
   best: number | null,
+  average: PerformanceMetrics,
 ) {
   const value = metrics[indicator.key];
   const significant = isSignificant(metrics, options.minRaces);
   const isHighlighted = indicator.key === options.highlight.key && significant;
   const intensity = isHighlighted ? heatIntensity(value, best, indicator) : 0;
   const isBest = isHighlighted && value !== null && value === best;
+  const delta =
+    options.showAverageDelta && significant
+      ? compareToAverage(value, average[indicator.key], indicator)
+      : null;
   return h(
     'div',
     {
@@ -69,7 +83,12 @@ function renderCell(
           ? 'Aucune course'
           : `${metrics.raceCount} course(s) — cliquer pour le détail`,
     },
-    indicator.format(value),
+    delta
+      ? [
+          h('span', indicator.format(value)),
+          h('span', { class: `metric-delta metric-delta--${delta.direction}` }, delta.text),
+        ]
+      : indicator.format(value),
   );
 }
 
@@ -80,6 +99,7 @@ function buildGroup(
   column: PerformanceColumn | null,
 ): DataTableColumn<StallionPerformanceRow> {
   const cells = options.matrix.rows.map((row) => metricsOf(row, key));
+  const average = averageOf(options.matrix, key);
   return {
     title,
     key: String(key),
@@ -106,7 +126,7 @@ function buildGroup(
           onClick: () => options.onCellClick(row, column),
         }),
         render: (row: StallionPerformanceRow) =>
-          renderCell(metricsOf(row, key), indicator, options, best),
+          renderCell(metricsOf(row, key), indicator, options, best, average),
       };
     }),
   };

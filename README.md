@@ -1,4 +1,4 @@
-# Lignées — statistiques des étalons
+# AlexisPD — statistiques des étalons
 
 Application web locale pour saisir des résultats de courses hippiques et comparer automatiquement
 les performances des étalons (pères des chevaux) selon l'état du terrain et la distance.

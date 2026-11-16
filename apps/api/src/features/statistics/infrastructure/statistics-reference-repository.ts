@@ -4,8 +4,6 @@ import { toIsoDate } from '../../../shared/utils/iso-date';
 import { formatDistance, type ColumnOption } from '../domain/performance-columns';
 import type { StallionReference } from '../domain/performance-matrix';
 
-export type SourceVolumes = Omit<StatisticsOverview, 'global'>;
-
 /** Reference data the statistics need to build complete grids (rows and columns). */
 export class StatisticsReferenceRepository {
   constructor(private readonly database: Database) {}
@@ -18,7 +16,7 @@ export class StatisticsReferenceRepository {
     });
   }
 
-  async countSources(): Promise<SourceVolumes> {
+  async countSources(): Promise<StatisticsOverview> {
     const [stallionCount, horseCount, raceCount, participationCount, dates] = await Promise.all([
       this.database.stallion.count(),
       this.database.horse.count(),

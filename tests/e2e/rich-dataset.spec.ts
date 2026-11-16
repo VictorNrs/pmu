@@ -60,7 +60,19 @@ test('renders tables and charts on a realistic data set', async ({ page, request
   await page.goto('/statistiques/terrain');
   await expect(page.getByRole('link', { name: 'Frankel' })).toBeVisible();
   await expect(page.locator('.metric-cell--best').first()).toBeVisible();
+  await expect(page.locator('.summary-label', { hasText: 'Moyenne' })).toBeVisible();
+  await page.getByText('Écart à la moyenne').click();
+  await expect(page.locator('.metric-delta').first()).toBeVisible();
+  await expect(page.locator('.n-checkbox', { hasText: 'Écart à la moyenne' })).toHaveClass(
+    /n-checkbox--checked/,
+  );
   await page.screenshot({ path: 'test-results/rich-terrain-table.png' });
+
+  await page.goto('/');
+  await expect(page.getByText('Meilleurs % de victoires')).toBeVisible();
+  await expect(page.getByText('Courses saisies')).toBeVisible();
+  await expect(page.locator('.stat-card', { hasText: 'Rang moyen' })).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/rich-dashboard.png', fullPage: true });
 
   await page.goto('/statistiques/distance');
   await expect(page.locator('th', { hasText: '2400 m' })).toBeVisible();

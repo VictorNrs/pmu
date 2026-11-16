@@ -24,6 +24,7 @@ import {
   buildRankingOption,
   buildTrendOption,
 } from './comparison-options';
+import { emptyMatrix } from '@/features/statistics/empty-matrix';
 import EChart from './EChart.vue';
 import { buildHeatmapOption } from './heatmap-option';
 
@@ -34,7 +35,7 @@ const dimension = ref<PerformanceDimension>('terrain');
 const indicatorKey = ref<ChartIndicator>('winRate');
 const minRaces = ref(3);
 const selectedIds = ref<number[]>([]);
-const matrix = ref<PerformanceMatrix>({ dimension: 'terrain', columns: [], rows: [] });
+const matrix = ref<PerformanceMatrix>(emptyMatrix('terrain'));
 const ranking = ref<StallionRankingEntry[]>([]);
 const trends = ref<StallionTrend[]>([]);
 

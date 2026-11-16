@@ -50,7 +50,23 @@ export function buildPerformanceMatrix(
       cells,
     };
   });
-  return { dimension, columns: [...columns], rows };
+  return { dimension, columns: [...columns], rows, average: buildAverage(columns, groups) };
+}
+
+/**
+ * Reference average of the selection: counters of every stallion are summed first,
+ * then the indicators are computed once (never an average of averages).
+ */
+function buildAverage(
+  columns: readonly PerformanceColumn[],
+  groups: readonly GroupCounts[],
+): PerformanceMatrix['average'] {
+  const cells: PerformanceMatrix['average']['cells'] = {};
+  for (const column of columns) {
+    const columnGroups = groups.filter((group) => group.columnKey === column.key);
+    cells[column.key] = computePerformanceMetrics(sumCounts(columnGroups));
+  }
+  return { total: computePerformanceMetrics(sumCounts(groups)), cells };
 }
 
 /** A participation outside the displayed columns would silently disappear from the totals. */

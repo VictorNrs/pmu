@@ -37,10 +37,20 @@ export interface StallionPerformanceRow {
   cells: Record<number, PerformanceMetrics>;
 }
 
+/**
+ * Reference average: indicators computed on every participation of the selection,
+ * all stallions together, per column and in total. Used to compare a stallion to the mean.
+ */
+export interface PerformanceAverage {
+  total: PerformanceMetrics;
+  cells: Record<number, PerformanceMetrics>;
+}
+
 export interface PerformanceMatrix {
   dimension: PerformanceDimension;
   columns: PerformanceColumn[];
   rows: StallionPerformanceRow[];
+  average: PerformanceAverage;
 }
 
 export const RANKING_METRICS = ['winRate', 'placeRate', 'averageFinishPosition'] as const;
@@ -72,6 +82,7 @@ export interface StallionTrend {
   points: PerformanceTrendPoint[];
 }
 
+/** Data volumes shown on the dashboard. */
 export interface StatisticsOverview {
   stallionCount: number;
   horseCount: number;
@@ -79,5 +90,4 @@ export interface StatisticsOverview {
   participationCount: number;
   firstRaceDate: string | null;
   lastRaceDate: string | null;
-  global: PerformanceMetrics;
 }

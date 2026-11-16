@@ -247,14 +247,32 @@ describe('Statistics (PostgreSQL)', () => {
 
     it('summarizes the volumes for the dashboard', async () => {
       const overview = await get<StatisticsOverview>('/api/statistics/overview');
-      expect(overview).toMatchObject({
+      expect(overview).toEqual({
         stallionCount: 3,
         horseCount: 3,
         raceCount: 4,
         participationCount: 8,
         firstRaceDate: '2026-01-10',
         lastRaceDate: '2026-02-15',
-        global: { raceCount: 8, winCount: 3, placeCount: 3, averageFinishPosition: 2.75 },
+      });
+    });
+
+    it('returns the reference average of each column, all stallions together', async () => {
+      const matrix = await get<PerformanceMatrix>('/api/statistics/performance?dimension=terrain');
+      // Bon: Alpha 1, 1 ; Bravo 3, 2 -> 4 races, 2 wins, 2 places, average 7 / 4
+      expect(matrix.average.cells[terrain.Bon ?? 0]).toEqual({
+        raceCount: 4,
+        winCount: 2,
+        placeCount: 2,
+        winRate: 0.5,
+        placeRate: 0.5,
+        averageFinishPosition: 1.75,
+      });
+      expect(matrix.average.total).toMatchObject({
+        raceCount: 8,
+        winCount: 3,
+        placeCount: 3,
+        averageFinishPosition: 2.75,
       });
     });
   });

@@ -6,13 +6,7 @@ import { RouterLink } from 'vue-router';
 import StatCard from '@/components/StatCard.vue';
 import { racesApi } from '@/services/data-api';
 import { statisticsApi } from '@/services/statistics-api';
-import {
-  formatAverage,
-  formatCount,
-  formatDate,
-  formatPercent,
-  getIndicator,
-} from '@/utils/metric-format';
+import { formatCount, formatDate, getIndicator } from '@/utils/metric-format';
 
 const RANKING_MIN_RACES = 3;
 const overview = ref<StatisticsOverview | null>(null);
@@ -114,23 +108,6 @@ onMounted(async () => {
         label="Courses saisies"
         :value="formatCount(overview.raceCount)"
         :hint="`${overview.participationCount} participation(s)`"
-      />
-      <StatCard
-        label="% Victoires"
-        :value="formatPercent(overview.global.winRate)"
-        :hint="`${overview.global.winCount} victoire(s)`"
-        accent="gold"
-      />
-      <StatCard
-        label="% Places (2e-3e)"
-        :value="formatPercent(overview.global.placeRate)"
-        :hint="`${overview.global.placeCount} place(s)`"
-        accent="primary"
-      />
-      <StatCard
-        label="Rang moyen"
-        :value="formatAverage(overview.global.averageFinishPosition)"
-        hint="Tous chevaux suivis"
       />
     </div>
 

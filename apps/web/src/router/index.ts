@@ -74,5 +74,5 @@ export const routes: RouteRecordRaw[] = [
 export const router = createRouter({ history: createWebHistory(), routes });
 
 router.afterEach((to) => {
-  document.title = `${to.meta.title} · Lignées`;
+  document.title = `${to.meta.title} · AlexisPD`;
 });
