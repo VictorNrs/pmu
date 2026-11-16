@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*.local
+*.log
+apps/api/src/generated/
+test-results/
+playwright-report/
+playwright/.cache/
+.vite/

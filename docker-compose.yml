@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: pmu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pmu
+      POSTGRES_PASSWORD: pmu_local_password
+      POSTGRES_DB: pmu_dev
+    ports:
+      - '55432:5432'
+    volumes:
+      - pmu-postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pmu -d pmu_dev']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pmu-postgres-data:
