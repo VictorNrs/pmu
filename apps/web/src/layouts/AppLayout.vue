@@ -53,7 +53,7 @@ const activeKey = computed(() =>
       @expand="collapsed = false"
     >
       <div class="brand" :class="{ 'brand--collapsed': collapsed }">
-        <img src="/favicon.svg" alt="" class="brand__logo" />
+        <img src="/image.png" alt="" class="brand__logo" />
         <div v-if="!collapsed">
           <div class="brand__name">AlexisPD</div>
           <div class="brand__tagline">Performances des étalons</div>
