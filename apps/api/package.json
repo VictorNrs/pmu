@@ -1,0 +1,36 @@
+{
+  "name": "@pmu/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API Fastify : gestion des données hippiques et moteur statistique",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --selectProjects unit",
+    "test:integration": "cross-env ENV_FILE=.env.test prisma migrate deploy && cross-env ENV_FILE=.env.test NODE_OPTIONS=--experimental-vm-modules jest --selectProjects integration --runInBand",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.4.3",
+    "@pmu/shared": "*",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "fastify": "^5.12.8",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/pg": "^8.23.1",
+    "cross-env": "^10.1.0",
+    "jest": "^30.5.2",
+    "prisma": "7.10.1",
+    "ts-jest": "^29.4.15",
+    "tsx": "^4.23.15"
+  }
+}
